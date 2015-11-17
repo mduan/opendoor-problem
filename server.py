@@ -24,32 +24,33 @@ def listings():
   house_listings = []
   start_idx = page * results_per_page
   end_idx = (page + 1) * results_per_page
-  for curr_idx, house in enumerate(app.config.houses):
-    if curr_idx >= end_idx: # early terminate when we have enough results for current page
-      break
+  curr_idx = 0
+  for house in app.config.houses:
     price = house['price']
     num_beds = house['bedrooms']
     num_baths = house['bathrooms']
     if (price >= min_price and price <= max_price and
         num_beds >= min_bed and num_beds <= max_bed and
-        num_baths >= min_bath and num_baths <= max_bath and
-        curr_idx >= start_idx and curr_idx < end_idx):
-      house_listings.append({
-        'type': 'Feature',
-        'geometry': {
-          'type': 'Point',
-          'coordinates': [house['lng'], house['lat']],
-        },
-        'properties': {
-          'id': house['id'],
-          'price': house['price'],
-          'street': house['street'],
-          'bedroom': house['bedrooms'],
-          'bathrooms': house['bathrooms'],
-          'sq_ft': house['sq_ft'],
-        },
-      })
-      print curr_idx
+        num_baths >= min_bath and num_baths <= max_bath):
+      if curr_idx >= start_idx and curr_idx < end_idx:
+        house_listings.append({
+          'type': 'Feature',
+          'geometry': {
+            'type': 'Point',
+            'coordinates': [house['lng'], house['lat']],
+          },
+          'properties': {
+            'id': house['id'],
+            'price': house['price'],
+            'street': house['street'],
+            'bedroom': house['bedrooms'],
+            'bathrooms': house['bathrooms'],
+            'sq_ft': house['sq_ft'],
+          },
+        })
+      curr_idx += 1
+      if curr_idx >= end_idx: # early terminate when we have enough results for current page
+        break
 
   response = {
     'type': 'FeatureCollection',
